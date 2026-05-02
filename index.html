@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mystery Protocol</title>
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at center, #050505, #000);
+  color: #d0d0d0;
+  font-family: monospace;
+  overflow: hidden;
+  cursor: pointer;
+}.center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 90%; }
+
+.glitch { font-size: 2rem; letter-spacing: 4px; animation: flicker 2s infinite; }
+
+@keyframes flicker { 0%,100% {opacity:1;} 50% {opacity:0.3;} }
+
+#text { margin-top: 20px; font-size: 1rem; color: #888; min-height: 60px; }
+
+.cursor { display: inline-block; width: 10px; height: 18px; background: #888; animation: blink 0.7s infinite; }
+
+@keyframes blink { 50% { opacity: 0; } }
+
+.particles span { position: absolute; width: 2px; height: 2px; background: #444; animation: float 10s linear infinite; }
+
+@keyframes float { from {transform: translateY(100vh);} to {transform: translateY(-10vh);} }
+
+button { background: transparent; border: 1px solid #555; color: #aaa; padding: 10px 15px; margin: 10px; cursor: pointer; font-family: monospace; }
+
+button:hover { border-color: #fff; color: #fff; }
+
+.hint { margin-top: 10px; font-size: 0.8rem; color: #555; } </style>
+
+</head>
+<body><div class="particles" id="particles"></div><div class="center">
+  <div class="glitch" id="main">YOU SHOULDN'T BE HERE</div>
+  <div id="text"></div>
+  <div id="choices"></div>
+</div><script>
+const states = [
+  "system locked...",
+  "accessing hidden layer...",
+  "name detected: ANNA",
+  "she left fragments in the code",
+  "do you want to see the truth?"
+];
+
+let ended = localStorage.getItem("ended") === "true";
+
+let stage = ended
+  ? 6
+  : parseInt(localStorage.getItem("stage"));
+
+if (isNaN(stage)) stage = 0;
+
+let path = localStorage.getItem("path") || null;
+
+let textEl = document.getElementById("text");
+let main = document.getElementById("main");
+let choices = document.getElementById("choices");
+
+function save(){
+  if(!ended) localStorage.setItem("stage", stage);
+}
+
+function typeText(msg){
+  let j = 0;
+  textEl.innerHTML = "";
+
+  let interval = setInterval(()=>{
+    textEl.innerHTML = msg.substring(0,j++);
+    if(j>msg.length) clearInterval(interval);
+  },30);
+}
+
+function showChoices(){
+  if(ended) return;
+
+  choices.innerHTML = `
+    <button onclick="choose('trust')">TRUST HER</button>
+    <button onclick="choose('truth')">SEEK TRUTH</button>
+  `;
+}
+
+window.choose = function(c){
+  path = c;
+  localStorage.setItem("path", path);
+  choices.innerHTML = "";
+  stage++;
+  save();
+  render();
+}
+
+function render(){
+
+  if(ended){
+    main.innerText = "SYSTEM CLOSED";
+    textEl.innerHTML = "She was always here.";
+    choices.innerHTML = "";
+    return;
+  }
+
+  if(stage===0){
+    main.innerText="YOU SHOULDN'T BE HERE";
+    typeText("...system unstable");
+  }
+  else if(stage===1){
+    main.innerText="ACCESSING...";
+    typeText(states[0]);
+  }
+  else if(stage===2){
+    main.innerText="BREACH DETECTED";
+    typeText(states[1]);
+  }
+  else if(stage===3){
+    main.innerText="ANNA";
+    typeText(states[2]);
+  }
+  else if(stage===4){
+    main.innerText="FRAGMENTS FOUND";
+    typeText(states[3]);
+  }
+  else if(stage===5){
+    main.innerText="FINAL DECISION";
+    typeText(states[4]);
+    showChoices();
+  }
+}
+
+function nextStage(){
+  if(ended) return;
+
+  if(stage < 5){
+    stage++;
+    save();
+    render();
+  } else {
+    ended = true;
+    localStorage.setItem("ended","true");
+    localStorage.removeItem("stage");
+    render();
+  }
+}
+
+document.body.addEventListener("click", nextStage);
+
+render();
+
+// particles
+const container=document.getElementById("particles");
+for(let i=0;i<80;i++){
+  let s=document.createElement("span");
+  s.style.left=Math.random()*100+"vw";
+  s.style.animationDuration=(5+Math.random()*10)+"s";
+  container.appendChild(s);
+}
+</script></body>
+</html>

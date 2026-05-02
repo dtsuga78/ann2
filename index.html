@@ -45,7 +45,7 @@ const states = [
   "accessing hidden layer...",
   "name detected: ANNA",
   "she left fragments in the code",
-  "do you want to see the truth?"
+  "It could be dangerous"
 ];
 
 let ended = localStorage.getItem("ended") === "true";
@@ -60,7 +60,6 @@ let path = localStorage.getItem("path") || null;
 
 let textEl = document.getElementById("text");
 let main = document.getElementById("main");
-let choices = document.getElementById("choices");
 
 function save(){
   if(!ended) localStorage.setItem("stage", stage);
@@ -76,14 +75,6 @@ function typeText(msg){
   },30);
 }
 
-function showChoices(){
-  if(ended) return;
-
-  choices.innerHTML = `
-    <button onclick="choose('trust')">TRUST HER</button>
-    <button onclick="choose('truth')">SEEK TRUTH</button>
-  `;
-}
 
 window.choose = function(c){
   path = c;
@@ -124,7 +115,7 @@ function render(){
     typeText(states[3]);
   }
   else if(stage===5){
-    main.innerText="FINAL DECISION";
+    main.innerText="Be Careful";
     typeText(states[4]);
     showChoices();
   }
